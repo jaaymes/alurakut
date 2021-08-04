@@ -45,7 +45,7 @@ export function Menu({ gitHubUser }: MenuProps) {
       </div>
       <ProfileSideBar isMenuOpen={IsMenuOpen} gitHubUser={gitHubUser}>
         <div>
-          <img src={`https:github.com/${gitHubUser}.png`} />
+          <img src={`https:/github.com/${gitHubUser}.png`} />
           <hr />
           <p>
             <a className="boxLink" href={`/user/${gitHubUser}`}>
