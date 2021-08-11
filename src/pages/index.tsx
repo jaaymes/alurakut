@@ -1,4 +1,4 @@
-import { FormEvent } from "react";
+import React, { FormEvent, useState } from "react";
 import { Box } from "../components/Box";
 import { MainGrid } from "../components/MainGrid";
 import { Menu } from "../components/Menu";
@@ -10,9 +10,18 @@ type HomeProps = {
   gitHubUser: string;
 };
 
+type comunidadeProps = {
+  id: string;
+  title: string;
+  image: string;
+}
+
+
+// comunidade: comunidadeProps[];
+
 function ProfileSideBar({ gitHubUser }: HomeProps) {
   return (
-    <Box>
+    <Box as="aside">
       <img src={`https://github.com/${gitHubUser}.png`} alt="Jaymes Costa" />
       <hr />
       <a className="boxLink" href={`http://github.com/${gitHubUser}`}>
@@ -25,12 +34,35 @@ function ProfileSideBar({ gitHubUser }: HomeProps) {
 }
 
 export default function Home() {
-  const gitHubUser = "jaaymes";
-  const pessoasFavoritas = ["luis", "jaaymes", "andre", "joao"];
+  const [comunidades, setComunidades] = useState([{
+    id: '12312313',
+    title: 'Eu odeio acordar cedo',
+    image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg',
+  }])
 
-  function handleSubmit(e:FormEvent){
+  const gitHubUser = "jaaymes";
+
+  const pessoasFavoritas = ["luis", "jaaymes", "carol", "jose"];
+
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    console.log(e)
+
+
+
+    const dadosDoForm = new FormData(e.target as HTMLFormElement)
+
+    const comunidade = {
+      id: new Date().toISOString(),
+      title: dadosDoForm.get('title') as String,
+      image: dadosDoForm.get('image') as String,
+    } as comunidadeProps;
+
+    const comunidadesAtualizadas = [...comunidades, comunidade]
+
+    // console.log('Campo: ', dadosDoForm.get('title'));
+    // console.log('Campo: ', dadosDoForm.get('image'));
+
+    setComunidades(comunidadesAtualizadas);
 
   }
   return (
@@ -72,6 +104,24 @@ export default function Home() {
         </div>
         <div style={{ gridArea: "profileRelationsArea" }}>
           <ProfileRelationsBoxWrapper>
+          <h2 className="smallTitle">
+              Comunidades ({comunidades.length})
+            </h2>
+            <ul>
+              {comunidades.map((itemAtual) => {
+                return (
+                  <li key={itemAtual.title}>
+                    <a href={`/users/${itemAtual.title}`}>
+                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                      <img src={itemAtual.image} />
+                      <span>{itemAtual.title}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </ProfileRelationsBoxWrapper>
+          <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle">
               Pessoas da Comunidade ({pessoasFavoritas.length})
             </h2>
@@ -81,6 +131,7 @@ export default function Home() {
                 return (
                   <li key={pessoaAtual}>
                     <a href={`/users/${pessoaAtual}`}>
+                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
                       <img src={`https://github.com/${pessoaAtual}.png`} />
                       <span>{pessoaAtual}</span>
                     </a>
