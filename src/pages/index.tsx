@@ -16,6 +16,11 @@ type comunidadeProps = {
   image: string;
 }
 
+type seguidoresProps = {
+  id: number;
+  login: string;
+}
+
 
 // comunidade: comunidadeProps[];
 
@@ -46,9 +51,6 @@ export default function Home() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-
-
-
     const dadosDoForm = new FormData(e.target as HTMLFormElement)
 
     const comunidade = {
@@ -65,6 +67,15 @@ export default function Home() {
     setComunidades(comunidadesAtualizadas);
 
   }
+
+const seguidores = fetch('https://api.github.com/users/jaaymes/followers')
+.then(function(response){
+  return response.json();
+})
+.then(function(responseData){
+  console.log(responseData)
+}) as seguidoresProps;
+
   return (
     <>
       <Menu gitHubUser={gitHubUser} />
@@ -103,6 +114,26 @@ export default function Home() {
           </Box>
         </div>
         <div style={{ gridArea: "profileRelationsArea" }}>
+          
+        <ProfileRelationsBoxWrapper>
+          <h2 className="smallTitle">
+              Seguidores ({seguidores.length})
+            </h2>
+            <ul>
+              {seguidores.map((itemAtual) => {
+                return (
+                  <li key={itemAtual.id}>
+                    <a href={`/users/${itemAtual.}`}>
+                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                      <img src={itemAtual.image} />
+                      <span>{itemAtual.title}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </ProfileRelationsBoxWrapper>
+
           <ProfileRelationsBoxWrapper>
           <h2 className="smallTitle">
               Comunidades ({comunidades.length})
