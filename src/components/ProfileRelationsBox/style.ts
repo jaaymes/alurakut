@@ -49,4 +49,13 @@ export const ProfileRelationsBoxWrapper = styled(Box)`
       background-image: linear-gradient(0deg,#00000073,transparent);
     }
   }
+  .seeMore {
+    color: #66a3ff;
+    margin-top: 20px;
+
+    &:hover{
+      cursor: pointer;
+      filter: brightness(1.2);
+    }
+  }
 `;
