@@ -6,10 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc -w"
   },
   "dependencies": {
+    "@types/axios": "^0.14.0",
     "@types/styled-components": "^5.1.11",
+    "axios": "^0.21.1",
     "babel-plugin-styled-components": "^1.13.1",
     "next": "11.0.1",
     "react": "17.0.2",
@@ -18,7 +21,9 @@
   },
   "devDependencies": {
     "@types/react": "17.0.13",
-    "eslint": "7.30.0",
+    "@typescript-eslint/eslint-plugin": "^4.29.2",
+    "@typescript-eslint/parser": "^4.29.2",
+    "eslint": "^7.32.0",
     "eslint-config-next": "11.0.1",
     "typescript": "4.3.5"
   }

@@ -1,44 +1,25 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { Box } from "../components/Box";
 import { MainGrid } from "../components/MainGrid";
 import { Menu } from "../components/Menu";
 import { OrkutNostalgicIconSet } from "../components/OrkutNostalgicIconSet";
-import { ProfileRelationsBoxWrapper } from "../components/ProfileRelationsBox";
-import { ProfileSideBarMenuDefault } from "../components/ProfileSideBarMenuDefault";
-
-type HomeProps = {
-  gitHubUser: string;
-};
-
-type comunidadeProps = {
-  id: string;
-  title: string;
-  image: string;
-}
+import { ProfileRelationsBox } from "../components/ProfileRelationsBox";
+// import { ProfileRelationsBoxWrapper } from "../components/ProfileRelationsBox/style";
+import { ProfileSideBar } from "../components/ProfileSideBar";
+import { githubApi } from "../services/githubApi";
+import { HomeProps, comunidadeProps, FriendsProps } from '../utils/types';
 
 
-// comunidade: comunidadeProps[];
-
-function ProfileSideBar({ gitHubUser }: HomeProps) {
-  return (
-    <Box as="aside">
-      <img src={`https://github.com/${gitHubUser}.png`} alt="Jaymes Costa" />
-      <hr />
-      <a className="boxLink" href={`http://github.com/${gitHubUser}`}>
-        @{gitHubUser}
-      </a>
-      <hr />
-      <ProfileSideBarMenuDefault />
-    </Box>
-  );
-}
-
-export default function Home() {
+export default function Home({ friends }: HomeProps) {
   const [comunidades, setComunidades] = useState([{
     id: '12312313',
     title: 'Eu odeio acordar cedo',
     image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg',
   }])
+  const [followers, setFollowers] = useState<FriendsProps[]>([])
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false)
 
   const gitHubUser = "jaaymes";
 
@@ -46,15 +27,12 @@ export default function Home() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-
-
-
     const dadosDoForm = new FormData(e.target as HTMLFormElement)
 
     const comunidade = {
       id: new Date().toISOString(),
-      title: dadosDoForm.get('title') as String,
-      image: dadosDoForm.get('image') as String,
+      title: dadosDoForm.get('title') as string,
+      image: dadosDoForm.get('image') as string,
     } as comunidadeProps;
 
     const comunidadesAtualizadas = [...comunidades, comunidade]
@@ -65,6 +43,22 @@ export default function Home() {
     setComunidades(comunidadesAtualizadas);
 
   }
+
+  useEffect(() => {
+    Promise.all([
+      githubApi.get(`/users/${gitHubUser}/followers`)
+    ]).then(([responseFollowers]) => {
+      setFollowers(responseFollowers.data)
+    }).catch(() => {
+      setError(true);
+    }).finally(() => {
+      setLoading(false);
+    }
+    )
+
+  })
+
+
   return (
     <>
       <Menu gitHubUser={gitHubUser} />
@@ -103,43 +97,45 @@ export default function Home() {
           </Box>
         </div>
         <div style={{ gridArea: "profileRelationsArea" }}>
-          <ProfileRelationsBoxWrapper>
-          <h2 className="smallTitle">
-              Comunidades ({comunidades.length})
-            </h2>
-            <ul>
-              {comunidades.map((itemAtual) => {
-                return (
-                  <li key={itemAtual.title}>
-                    <a href={`/users/${itemAtual.title}`}>
-                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                      <img src={itemAtual.image} />
-                      <span>{itemAtual.title}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
-          <ProfileRelationsBoxWrapper>
-            <h2 className="smallTitle">
-              Pessoas da Comunidade ({pessoasFavoritas.length})
-            </h2>
 
-            <ul>
-              {pessoasFavoritas.map((pessoaAtual) => {
-                return (
-                  <li key={pessoaAtual}>
-                    <a href={`/users/${pessoaAtual}`}>
-                      {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                      <img src={`https://github.com/${pessoaAtual}.png`} />
-                      <span>{pessoaAtual}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
+          <ProfileRelationsBox
+            title={`Seguidoes(${followers.length})`}
+            data={followers.map((follower) => ({
+              key: String(follower.id),
+              href: follower.html_url,
+              imageSrc: follower.avatar_url,
+              title: follower.login,
+            }))}
+            target="_blank"
+            loading={loading}
+            error={error}
+          />
+
+          <ProfileRelationsBox
+            title={`Comunidades(${comunidades.length})`}
+            data={comunidades.map((comunidade) => ({
+              key: String(comunidade.id),
+              href: comunidade.image,
+              imageSrc: comunidade.image,
+              title: comunidade.title,
+            }))}
+            target="_blank"
+            loading={loading}
+            error={error}
+          />
+
+          <ProfileRelationsBox
+            title={`Pessoas Favoritas(${pessoasFavoritas.length})`}
+            data={pessoasFavoritas.map((pessoaAtual) => ({
+              key: String(pessoaAtual),
+              href: `https://github.com/users/${pessoaAtual}`,
+              imageSrc: `https://github.com/${pessoaAtual}.png`,
+              title: pessoaAtual,
+            }))}
+            target="_blank"
+            loading={loading}
+            error={error}
+          />
         </div>
       </MainGrid>
     </>
